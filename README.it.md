@@ -112,7 +112,6 @@ authentik oppure basic auth di Traefik (il server non ha un'autenticazione propr
 senza).
 
 ```bash
-docker login ghcr.io          # solo finché il pacchetto è privato
 docker stack deploy --with-registry-auth --prune -c deploy/swarm-stack.yml oscura-atti
 ```
 

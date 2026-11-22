@@ -108,7 +108,6 @@ replicas, rolling updates, memory limits, TLS, and authentication through authen
 or Traefik basic auth (the server has no authentication of its own: never expose it without).
 
 ```bash
-docker login ghcr.io          # only while the package is private
 docker stack deploy --with-registry-auth --prune -c deploy/swarm-stack.yml oscura-atti
 ```
 
