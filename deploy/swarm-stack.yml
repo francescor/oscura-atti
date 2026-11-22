@@ -1,0 +1,73 @@
+---
+# oscura-atti — Docker Swarm stack behind Traefik
+#   deploy:  yamllint --no-warnings swarm-stack.yml &&
+#            docker stack deploy --with-registry-auth --prune -c swarm-stack.yml oscura-atti
+#   The image comes from GHCR (built by the "docker image" GitHub Action at every push to main);
+#   for a private package the node must have run "docker login ghcr.io".
+#   MCP endpoint: https://oscura-atti.example.org/mcp
+#
+# The server has NO authentication of its own: never publish it without one of the two options below.
+#   A) authentik (or any forward-auth provider): the middlewares authentik-strip@swarm and
+#      authentik-forward@swarm and the service authentik@swarm are defined by the authentik stack;
+#      MCP clients send "Authorization: Basic user:app-password".
+#   B) Traefik basic auth: replace the htpasswd line (htpasswd -nB user; double every "$" in YAML)
+#      and use the router "oscura-atti-basic" instead of "oscura-atti" (comment out the other one).
+# Data: /data inside the container is the only folder the tools may read/write by path
+#   (OSCURA_ATTI_DIR); most clients send documents as Base64 and need no volume at all.
+
+networks:
+  traefik:
+    external: true
+
+volumes:
+  oscura-data:
+
+services:
+
+  oscura-atti:
+    image: ghcr.io/francescor/oscura-atti:latest
+    environment:
+      OSCURA_ATTI_DIR: /data
+      TZ: Europe/Rome
+    volumes:
+      - oscura-data:/data
+    read_only: true
+    tmpfs:
+      - /tmp
+    networks:
+      - traefik
+    deploy:
+      replicas: 2
+      update_config:
+        parallelism: 1
+        order: start-first
+      restart_policy:
+        condition: any
+        delay: 10s
+      resources:
+        limits:
+          memory: 2G          # OCR and LibreOffice on long documents
+          cpus: '2'
+      labels:
+        traefik.enable: 'true'
+        traefik.swarm.network: traefik
+        traefik.http.services.oscura-atti.loadbalancer.server.port: 8000
+        # A) forward auth (authentik)
+        traefik.http.routers.oscura-atti.rule: 'Host(`oscura-atti.example.org`)'
+        traefik.http.routers.oscura-atti.entrypoints: websecure
+        traefik.http.routers.oscura-atti.tls: 'true'
+        traefik.http.routers.oscura-atti.tls.certresolver: 'mydnschallenge'
+        traefik.http.routers.oscura-atti.middlewares: 'goodheaders, authentik-strip@swarm, authentik-forward@swarm'
+        traefik.http.routers.oscura-atti-outpost.rule: 'Host(`oscura-atti.example.org`) && PathPrefix(`/outpost.goauthentik.io/`)'
+        traefik.http.routers.oscura-atti-outpost.entrypoints: websecure
+        traefik.http.routers.oscura-atti-outpost.tls: 'true'
+        traefik.http.routers.oscura-atti-outpost.tls.certresolver: 'mydnschallenge'
+        traefik.http.routers.oscura-atti-outpost.priority: 50
+        traefik.http.routers.oscura-atti-outpost.service: authentik@swarm
+        # B) basic auth instead of A: uncomment, and comment out the "A)" router lines above
+        # traefik.http.routers.oscura-atti-basic.rule: 'Host(`oscura-atti.example.org`)'
+        # traefik.http.routers.oscura-atti-basic.entrypoints: websecure
+        # traefik.http.routers.oscura-atti-basic.tls: 'true'
+        # traefik.http.routers.oscura-atti-basic.tls.certresolver: 'mydnschallenge'
+        # traefik.http.routers.oscura-atti-basic.middlewares: 'goodheaders, oscura-atti-auth'
+        # traefik.http.middlewares.oscura-atti-auth.basicauth.users: 'user:$$2y$$05$$replaceWithYourHash'

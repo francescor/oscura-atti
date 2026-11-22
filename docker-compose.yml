@@ -1,0 +1,20 @@
+# MCP server on http://127.0.0.1:8000/mcp, files in ./data (mounted as /data).
+#   docker compose up -d
+#   docker compose run --rm oscura-atti redact /data/act.pdf /data/act.redacted.pdf
+# The server has no authentication of its own: keep it on localhost or put it behind a reverse
+# proxy with login (see README, "Docker").
+services:
+  oscura-atti:
+    image: ghcr.io/francescor/oscura-atti:latest
+    build: .
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - ./data:/data
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop: [ALL]
+    restart: unless-stopped

@@ -1,0 +1,5 @@
+#!/bin/sh
+# Refuse PDFs and other documents (see tools/check_forbidden_files.py) and commits that update
+# only one language of a translated document (see tools/check_translations.py).
+python3 tools/check_forbidden_files.py --staged || exit 1
+exec python3 tools/check_translations.py --staged

@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "oscura-atti"
+version = "0.1.0"
+description = "Redact personal data in public-sector PDFs with consistent labels (Person 1, Person 2...) instead of black boxes. CLI, library and MCP server."
+readme = "README.md"
+license = "AGPL-3.0-or-later"
+requires-python = ">=3.11"
+dependencies = [
+    "pymupdf>=1.24",
+    "asn1crypto>=1.5",
+]
+
+[project.optional-dependencies]
+mcp = ["mcp>=2.0"]
+ner = ["gliner>=0.2", "sentencepiece", "protobuf", "tiktoken"]
+test = ["pytest>=8", "pytest-xdist>=3", "cryptography>=42"]
+
+[project.scripts]
+oscura-atti = "oscura_atti.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

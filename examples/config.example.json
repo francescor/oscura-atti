@@ -1,0 +1,11 @@
+{
+  "language": "it",
+  "packs": ["common", "it"],
+  "public_persons": ["Lucia Esemplari", "Paolo Modellini", "Rita Campioni"],
+  "public_domains": ["comune.example.it", "pec.comune.example.it"],
+  "public_values": ["0499 000000"],
+  "policy": {"VAT_NUMBER": "flag", "PLATE": "redact"},
+  "style": "label",
+  "ocr": true,
+  "ocr_language": "ita"
+}

@@ -1,0 +1,27 @@
+name: tests
+on: [push, pull_request]
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: No documents in the repository
+        run: python3 tools/check_forbidden_files.py
+      - name: Both languages updated together
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            python3 tools/check_translations.py --range "${{ github.event.pull_request.base.sha }}" "${{ github.sha }}"
+          else
+            python3 tools/check_translations.py --range "${{ github.event.before }}" "${{ github.sha }}"
+          fi
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: OCR engine
+        run: sudo apt-get update && sudo apt-get install -y tesseract-ocr tesseract-ocr-ita
+      - name: Install
+        run: pip install -e ".[mcp,test]" pytest-xdist
+      - name: Tests
+        run: pytest -q -n auto
