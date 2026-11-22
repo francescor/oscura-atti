@@ -713,25 +713,41 @@ def analyse(pdf: bytes, conf: Config | None = None, add: list[str] | None = None
     return analysis.report(include_values)
 
 
+def _labelled_text(dt: DocumentText, analysis: Analysis) -> str:
+    """The document text (OCR included) with every redacted value replaced by its label."""
+    spans = sorted(((m.start, m.end, e.label) for e in analysis.entities if e.action == "redact"
+                    for m in e.mentions), reverse=True)
+    out = dt.text
+    for start, end, label in spans:
+        out = out[:start] + label + out[end:]
+    return out.replace("\f", "\n")
+
+
 def redact(pdf: bytes, conf: Config | None = None, add: list[str] | None = None,
            keep: list[str] | None = None, include_values: bool = False,
-           verify_ocr: bool = True) -> tuple[bytes, dict]:
-    """Return (redacted PDF, report)."""
+           verify_ocr: bool = True, include_text: bool = False) -> tuple[bytes, dict]:
+    """Return (redacted PDF, report). With `include_text`, report["redacted_text"] is the text of the
+    redacted copy (OCR text included, values replaced by labels), e.g. for a search index."""
     conf = conf or Config()
     with pymupdf.open(stream=pdf, filetype="pdf") as doc:
         if doc.needs_pass:
             raise ValueError("password-protected PDF")
         analysis, dt = analyse_document(doc, conf, add, keep)
+        text = _labelled_text(dt, analysis) if include_text else None
         if not any(e.action == "redact" for e in analysis.entities):
             if not _personal_data_in_properties(doc, conf):
                 # Nothing to redact: the "copy" is the original, byte for byte (same SHA-256, no stamp).
                 report = analysis.report(include_values)
                 report.update(unchanged=True, changes="none", leaks=[])
+                if include_text:
+                    report["redacted_text"] = text
                 return pdf, report
             analysis.warnings.extend(apply(doc, [], conf.style, conf.stamp_text(metadata_only=True)))
             output = doc.tobytes(garbage=4, deflate=True, clean=True)
             report = analysis.report(include_values)
             report.update(unchanged=False, changes="metadata", leaks=[])
+            if include_text:
+                report["redacted_text"] = text
             return output, report
         replacements: list[Replacement] = []
         for e in analysis.entities:
@@ -755,6 +771,8 @@ def redact(pdf: bytes, conf: Config | None = None, add: list[str] | None = None,
                              skip_pages=[] if verify_ocr else dt.ocr_pages)
     if report["leaks"]:
         report["outcome"] = "review"
+    if include_text:
+        report["redacted_text"] = text
     return output, report
 
 

@@ -133,3 +133,13 @@ def test_signed_document_without_personal_data_keeps_the_signature():
     envelope = sign(doc.tobytes())
     out, report = service.redact(envelope)
     assert out == envelope and report["unchanged"] and report["signed_p7m"]
+
+
+@pytest.mark.skipif(not HAS_TESSERACT, reason="tesseract not installed")
+def test_redacted_text_of_a_scan():
+    doc = synthetic.generate(1, kind="contribution")
+    out, report = service.redact(synthetic.as_scan(doc.pdf), include_text=True)
+    text = report["redacted_text"]
+    assert "Persona 1" in text and "Codice fiscale 1" in text
+    for v in doc.private_values:
+        assert not present(v, text.lower().replace("\n", " ")), v
