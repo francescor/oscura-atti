@@ -7,6 +7,7 @@
 [![MCP Registry](https://img.shields.io/badge/MCP_Registry-io.github.francescor%2Foscura--atti-blue)](https://registry.modelcontextprotocol.io/v0.1/servers?search=io.github.francescor/oscura-atti)
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/francescor/oscura-atti/badge)](https://scorecard.dev/viewer/?uri=github.com/francescor/oscura-atti)
 [![License: AGPL-3.0-or-later](https://img.shields.io/badge/license-AGPL--3.0--or--later-blue)](LICENSE)
+[![francescor/oscura-atti MCP server](https://glama.ai/mcp/servers/francescor/oscura-atti/badges/score.svg)](https://glama.ai/mcp/servers/francescor/oscura-atti)
 
 <!-- mcp-name: io.github.francescor/oscura-atti -->
 
