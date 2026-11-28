@@ -2,6 +2,10 @@
 
 [English](README.md) · **Italiano**
 
+**Oscuramento dei dati personali in locale, a regole: niente cloud, niente apprendimento automatico
+obbligatorio. Si usa come server MCP per Claude e gli altri agenti di IA, da riga di comando, come
+libreria Python o come immagine Docker.**
+
 Oscura i dati personali negli atti della pubblica amministrazione (PDF, PDF firmati `.p7m`,
 Word/Excel/OpenDocument, immagini, testo) per poterli ripubblicare, sostituendo ogni dato con
 un'**etichetta coerente** invece che con un riquadro nero:
@@ -19,8 +23,18 @@ La stessa persona è sempre `Persona 1` in tutto il documento, un'altra persona 
 via per codici fiscali, IBAN, indirizzi, dati di nascita, telefoni, email, targhe e documenti
 d'identità. Il testo resta leggibile e la vicenda dell'atto resta comprensibile; le persone no.
 
-Si usa da **riga di comando**, come **libreria Python**, come **server MCP** (per Claude e gli altri
-client MCP) e come **immagine Docker**.
+In breve:
+
+- **Gira sul tuo computer.** I documenti non vengono inviati da nessuna parte e non si conserva nulla,
+  nemmeno la corrispondenza tra valori ed etichette.
+- **Server MCP** con due strumenti, `analyse_pdf` e `redact_pdf`: un agente di IA può produrre la copia
+  oscurata partendo dal percorso del file e riceve un rapporto senza i dati personali
+  ([configurazione](#server-mcp)).
+- **Controlla il proprio risultato.** La copia oscurata viene riletta (anche con l'OCR) e ogni dato
+  ancora estraibile viene segnalato; i documenti dubbi finiscono con esito `review`, perché decida una persona.
+- **Pensato e provato sugli atti della PA italiana.** Ci sono anche i pacchetti per codici e titoli
+  di cortesia di Regno Unito, Spagna, Francia e Germania, ma il benchmark e la prova reale qui sotto
+  sono su atti italiani.
 
 È nato come risposta a una domanda sul forum di Developers Italia: [*API/MCP per oscurare i dati
 personali nelle delibere a fine pubblicazione in albo?*](https://forum.italia.it/t/api-mcp-per-oscurare-i-dati-personali-nelle-delibere-a-fine-pubblicazione-in-albo/49338)
@@ -143,7 +157,16 @@ oscura-atti mcp                      # stdio
 oscura-atti mcp --http --port 8000   # Streamable HTTP su /mcp
 ```
 
-Claude Code: `claude mcp add oscura-atti -- oscura-atti mcp`. Strumenti:
+Claude Code, con i percorsi di file ammessi nella cartella corrente:
+
+```bash
+claude mcp add oscura-atti -e OSCURA_ATTI_DIR="$PWD" -- oscura-atti mcp
+```
+
+Poi basta chiedere, per esempio: *«Oscura atto.pdf con oscura-atti in atto.oscurato.pdf e dimmi
+l'esito»*. Con `path` e `output_path` l'agente non maneggia mai il documento: `redact_pdf` restituisce
+solo il rapporto, senza i valori. `analyse_pdf` invece restituisce i valori, per il controllo
+dell'operatore. Strumenti:
 
 | strumento | cosa fa |
 |---|---|

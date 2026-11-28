@@ -2,8 +2,11 @@
 
 **English** · [Italiano](README.it.md)
 
-Redact personal data in public-sector documents (PDF, digitally signed `.p7m`, Word/Excel/OpenDocument,
-images, text) so they can be republished, replacing every value with a **consistent label** instead of a black box:
+**Local, rule-based redaction of personal data: no cloud, no machine learning required. Use it as an
+MCP server for Claude and other AI agents, from the command line, as a Python library or as a Docker image.**
+
+It redacts public-sector documents (PDF, digitally signed `.p7m`, Word/Excel/OpenDocument, images, text) so
+they can be republished, replacing every value with a **consistent label** instead of a black box:
 
 > Vista l'istanza del sig. **Persona 1**, nato **Dati di nascita 1**, residente in **Indirizzo 1**,
 > codice fiscale **Codice fiscale 1** … di concedere al sig. **Persona 1** un contributo da accreditare
@@ -18,8 +21,16 @@ The same person is always `Persona 1` / `Person 1` throughout the document, a di
 `Persona 2`, and so on for tax codes, IBANs, addresses, birth data, phones, e-mails, plates and ID
 documents. The text stays readable and the story of the act stays understandable; the people do not.
 
-Available as a **command line tool**, a **Python library**, an **MCP server** (for Claude and other
-MCP clients) and a **Docker image**.
+At a glance:
+
+- **Runs on your machine.** Documents are not sent anywhere, and nothing is stored, not even the
+  mapping between values and labels.
+- **MCP server** with two tools, `analyse_pdf` and `redact_pdf`: an AI agent can produce the redacted
+  copy from a file path and gets back a report without the personal values ([setup](#mcp-server)).
+- **Checks its own output.** The redacted copy is read back (OCR included) and any value still
+  extractable is reported; doubtful documents end with outcome `review`, for a person to decide.
+- **Built and tested on Italian public-sector acts.** Packs for UK, Spanish, French and German codes
+  and courtesy titles are included, but the benchmark and the real-world run below are Italian.
 
 It started as an answer to a question on the Developers Italia forum: [*API/MCP per oscurare i dati
 personali nelle delibere a fine pubblicazione in albo?*](https://forum.italia.it/t/api-mcp-per-oscurare-i-dati-personali-nelle-delibere-a-fine-pubblicazione-in-albo/49338)
@@ -138,7 +149,15 @@ oscura-atti mcp                      # stdio
 oscura-atti mcp --http --port 8000   # Streamable HTTP at /mcp
 ```
 
-Claude Code: `claude mcp add oscura-atti -- oscura-atti mcp`. Tools:
+Claude Code, with file paths allowed inside the current folder:
+
+```bash
+claude mcp add oscura-atti -e OSCURA_ATTI_DIR="$PWD" -- oscura-atti mcp
+```
+
+Then ask, for example: *"Redact act.pdf with oscura-atti into act.redacted.pdf and tell me the outcome"*.
+With `path` and `output_path` the agent never handles the document itself: `redact_pdf` returns only
+the report, without values. `analyse_pdf` does return the values, for the operator's review. Tools:
 
 | tool | what it does |
 |---|---|
