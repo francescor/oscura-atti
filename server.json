@@ -1,0 +1,44 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.francescor/oscura-atti",
+  "title": "oscura-atti",
+  "description": "Redact personal data in documents with consistent labels (Person 1, Person 2...), locally, no cloud",
+  "repository": {
+    "url": "https://github.com/francescor/oscura-atti",
+    "source": "github"
+  },
+  "version": "0.1.0",
+  "packages": [
+    {
+      "registryType": "oci",
+      "identifier": "ghcr.io/francescor/oscura-atti:0.1.0",
+      "transport": {
+        "type": "stdio"
+      },
+      "runtimeArguments": [
+        {
+          "type": "named",
+          "name": "-v",
+          "description": "Folder with the documents, mounted as /data: the only folder the tools can read and write by path",
+          "value": "{documents_dir}:/data",
+          "isRequired": true,
+          "variables": {
+            "documents_dir": {
+              "description": "Folder on the host with the documents to redact",
+              "format": "filepath",
+              "isRequired": true
+            }
+          }
+        }
+      ],
+      "packageArguments": [
+        {
+          "type": "positional",
+          "valueHint": "command",
+          "value": "mcp",
+          "description": "Start the MCP server over stdio"
+        }
+      ]
+    }
+  ]
+}

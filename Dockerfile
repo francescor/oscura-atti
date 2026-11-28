@@ -3,6 +3,9 @@
 #   docker build -t oscura-atti:slim --build-arg WITH_OFFICE=false .   # without LibreOffice (~600 MB smaller)
 FROM python:3.12-slim
 
+# Ownership marker for the official MCP Registry: must match "name" in server.json.
+LABEL io.modelcontextprotocol.server.name="io.github.francescor/oscura-atti"
+
 ARG WITH_OFFICE=true
 ARG OCR_LANGS="ita eng spa fra deu"
 
@@ -29,5 +32,7 @@ EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s \
   CMD python -c "import socket; socket.create_connection(('127.0.0.1', 8000), 3)" || exit 1
 
+# Default: MCP over Streamable HTTP. For stdio (MCP clients that start the container):
+#   docker run -i --rm -v "$PWD:/data" ghcr.io/francescor/oscura-atti mcp
 ENTRYPOINT ["oscura-atti"]
 CMD ["mcp", "--http", "--host", "0.0.0.0", "--port", "8000"]
