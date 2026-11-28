@@ -20,7 +20,7 @@ RUN set -eux; \
 WORKDIR /app
 COPY pyproject.toml README.md LICENSE ./
 COPY src ./src
-RUN pip install --no-cache-dir ".[mcp]"
+RUN pip install --no-cache-dir .
 
 # Unprivileged user; /data is the only folder the MCP tools may read and write (OSCURA_ATTI_DIR).
 RUN useradd --create-home --uid 10001 oscura && mkdir -p /data && chown oscura /data

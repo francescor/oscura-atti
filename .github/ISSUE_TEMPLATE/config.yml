@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: A value is still readable in a redacted copy (security)
+    url: https://github.com/francescor/oscura-atti/security/advisories/new
+    about: Report it privately, with an invented example. Never attach the real document.

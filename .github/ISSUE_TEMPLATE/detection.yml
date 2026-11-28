@@ -1,0 +1,51 @@
+name: Detection problem
+description: A personal value was not redacted, or a public one was redacted (with an INVENTED example)
+title: "[detection] "
+labels: ["detection"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Never paste or attach a real document or real values** (names, tax codes, IBANs, addresses).
+        Rewrite the sentence with invented data that still shows the problem. `oscura-atti sample` gives you
+        an invented act to start from. If the redacted copy still shows a value, use a private security
+        report instead: https://github.com/francescor/oscura-atti/security/advisories/new
+        You can write in English or Italian.
+  - type: checkboxes
+    id: no-real-data
+    attributes:
+      label: Personal data
+      options:
+        - label: My example is invented and contains no real personal data.
+          required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What happened
+      options:
+        - A private value was NOT redacted
+        - A public value (official, organisation, street name...) WAS redacted
+        - Wrong label or wrong grouping (two people merged, one person split)
+    validations:
+      required: true
+  - type: textarea
+    id: text
+    attributes:
+      label: Invented text that reproduces it
+      description: The sentence or table row, with made-up names and codes.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: report
+    attributes:
+      label: Report
+      description: Output of `oscura-atti redact in.pdf out.pdf --report report.json` (it contains no values).
+      render: json
+  - type: input
+    id: version
+    attributes:
+      label: Version and how you run it
+      placeholder: "0.1.1, pip / uvx / Docker / MCP"
+    validations:
+      required: true

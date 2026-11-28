@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "If you use oscura-atti in research or in a report, please cite it as below."
+title: "oscura-atti: redaction of personal data in public-sector documents with consistent labels"
+type: software
+authors:
+  - given-names: Francesco
+    alias: francescor
+repository-code: "https://github.com/francescor/oscura-atti"
+license: AGPL-3.0-or-later
+version: 0.1.1
+date-released: "2026-11-28"
+keywords:
+  - redaction
+  - PII
+  - personal data
+  - pseudonymization
+  - GDPR
+  - public administration
+  - MCP

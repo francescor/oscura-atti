@@ -30,6 +30,16 @@ that uses it.
 - `service.py` — PDF or .p7m in; `cli.py`, `batch.py`, `mcp_server.py` (mcp SDK 2.x, `MCPServer`).
 - `bench.py` — benchmark on synthetic documents (leak and over-redaction rates).
 
+## Releases
+
+Version in three places (`pyproject.toml`, `src/oscura_atti/__init__.py`, `server.json`: CI checks them),
+`CHANGELOG.md` section with the date, then tag `vX.Y.Z`. `.github/workflows/publish.yml` does the rest:
+signed multi-arch image on GHCR, PyPI (Trusted Publishing, environment `pypi`), MCP Registry
+(`io.github.francescor/oscura-atti`, GitHub OIDC; needs the image label and the `mcp-name:` comment in
+both READMEs), GitHub release with the changelog section. Branch `main` and tags `v*` are protected by
+repository rulesets; the required check is "all tests passed". Actions are pinned to commit SHAs
+(Dependabot updates them).
+
 ## Commands
 
 ```bash

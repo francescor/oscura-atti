@@ -7,11 +7,37 @@
     "url": "https://github.com/francescor/oscura-atti",
     "source": "github"
   },
-  "version": "0.1.0",
+  "version": "0.1.1",
   "packages": [
     {
+      "registryType": "pypi",
+      "registryBaseUrl": "https://pypi.org",
+      "identifier": "oscura-atti",
+      "version": "0.1.1",
+      "runtimeHint": "uvx",
+      "transport": {
+        "type": "stdio"
+      },
+      "packageArguments": [
+        {
+          "type": "positional",
+          "valueHint": "command",
+          "value": "mcp",
+          "description": "Start the MCP server over stdio"
+        }
+      ],
+      "environmentVariables": [
+        {
+          "name": "OSCURA_ATTI_DIR",
+          "format": "filepath",
+          "isRequired": false,
+          "description": "Folder whose files the tools may read and write by path; without it documents travel as Base64"
+        }
+      ]
+    },
+    {
       "registryType": "oci",
-      "identifier": "ghcr.io/francescor/oscura-atti:0.1.0",
+      "identifier": "ghcr.io/francescor/oscura-atti:0.1.1",
       "transport": {
         "type": "stdio"
       },

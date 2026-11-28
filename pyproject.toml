@@ -1,23 +1,55 @@
 [build-system]
-requires = ["setuptools>=69"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "oscura-atti"
-version = "0.1.0"
-description = "Redact personal data in public-sector PDFs with consistent labels (Person 1, Person 2...) instead of black boxes. CLI, library and MCP server."
+version = "0.1.1"
+description = "Redact personal data (PII) in public-sector documents with consistent labels (Person 1, Person 2...) instead of black boxes. Local and rule-based: CLI, library and MCP server."
 readme = "README.md"
 license = "AGPL-3.0-or-later"
+license-files = ["LICENSE"]
+authors = [{ name = "Francesco R", email = "424577+francescor@users.noreply.github.com" }]
+keywords = ["redaction", "pii", "personal-data", "anonymization", "pseudonymization", "gdpr", "privacy",
+            "pdf", "ocr", "mcp", "mcp-server", "public-administration", "albo-pretorio"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Legal Industry",
+    "Natural Language :: English",
+    "Natural Language :: Italian",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Office/Business",
+    "Topic :: Security",
+    "Topic :: Text Processing",
+]
 requires-python = ">=3.11"
+# The MCP server is a core feature (MCP registries start it with `uvx oscura-atti mcp`), so its SDK is a
+# core dependency; the `mcp` extra stays as an empty alias for older install commands.
 dependencies = [
     "pymupdf>=1.24",
     "asn1crypto>=1.5",
+    "mcp>=2.0",
 ]
 
 [project.optional-dependencies]
-mcp = ["mcp>=2.0"]
+mcp = []
 ner = ["gliner>=0.2", "sentencepiece", "protobuf", "tiktoken"]
 test = ["pytest>=8", "pytest-xdist>=3", "cryptography>=42"]
+
+[project.urls]
+Homepage = "https://github.com/francescor/oscura-atti"
+Documentation = "https://github.com/francescor/oscura-atti#readme"
+Changelog = "https://github.com/francescor/oscura-atti/blob/main/CHANGELOG.md"
+Issues = "https://github.com/francescor/oscura-atti/issues"
+Security = "https://github.com/francescor/oscura-atti/security/policy"
 
 [project.scripts]
 oscura-atti = "oscura_atti.cli:main"

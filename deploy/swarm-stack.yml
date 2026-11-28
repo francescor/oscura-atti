@@ -2,7 +2,7 @@
 # oscura-atti — Docker Swarm stack behind Traefik
 #   deploy:  yamllint --no-warnings swarm-stack.yml &&
 #            docker stack deploy --with-registry-auth --prune -c swarm-stack.yml oscura-atti
-#   The image comes from GHCR (built by the "docker image" GitHub Action at every push to main);
+#   The image comes from GHCR (built by the "publish" GitHub workflow at every push to main);
 #   for a private package the node must have run "docker login ghcr.io".
 #   MCP endpoint: https://oscura-atti.example.org/mcp
 #

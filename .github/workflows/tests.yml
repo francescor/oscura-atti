@@ -1,27 +1,77 @@
 name: tests
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
 jobs:
-  tests:
+  checks:
+    name: repository checks
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
+          persist-credentials: false
       - name: No documents in the repository
         run: python3 tools/check_forbidden_files.py
       - name: Both languages updated together
+        env:
+          EVENT: ${{ github.event_name }}
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+          PUSH_BEFORE: ${{ github.event.before }}
+          HEAD: ${{ github.sha }}
         run: |
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            python3 tools/check_translations.py --range "${{ github.event.pull_request.base.sha }}" "${{ github.sha }}"
-          else
-            python3 tools/check_translations.py --range "${{ github.event.before }}" "${{ github.sha }}"
-          fi
-      - uses: actions/setup-python@v5
+          if [ "$EVENT" = "pull_request" ]; then base="$PR_BASE"; else base="$PUSH_BEFORE"; fi
+          python3 tools/check_translations.py --range "$base" "$HEAD"
+      - name: Versions agree (pyproject, package, server.json)
+        run: |
+          python3 - <<'PY'
+          import json, re, tomllib
+          v = tomllib.load(open("pyproject.toml", "rb"))["project"]["version"]
+          init = re.search(r'__version__ = "([^"]+)"', open("src/oscura_atti/__init__.py").read()).group(1)
+          s = json.load(open("server.json"))
+          found = {"src/oscura_atti/__init__.py": init, "server.json": s["version"]}
+          found.update({f"server.json {p['registryType']}": p.get("version") or p["identifier"].rsplit(":", 1)[1]
+                        for p in s["packages"]})
+          bad = {k: x for k, x in found.items() if x != v}
+          assert not bad, f"pyproject.toml says {v}, but: {bad}"
+          print("version", v, "everywhere")
+          PY
+
+  pytest:
+    name: pytest (Python ${{ matrix.python }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.11", "3.12", "3.13", "3.14"]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          python-version: "3.12"
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: ${{ matrix.python }}
       - name: OCR engine
         run: sudo apt-get update && sudo apt-get install -y tesseract-ocr tesseract-ocr-ita
       - name: Install
-        run: pip install -e ".[mcp,test]" pytest-xdist
+        run: pip install -e ".[test]" pytest-xdist
       - name: Tests
         run: pytest -q -n auto
+
+  # The single check required by the branch ruleset: it stays the same when the matrix changes.
+  all-tests:
+    name: all tests passed
+    if: always()
+    needs: [checks, pytest]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Every job succeeded
+        env:
+          RESULTS: ${{ join(needs.*.result, ' ') }}
+        run: |
+          echo "$RESULTS"
+          for r in $RESULTS; do [ "$r" = success ] || exit 1; done

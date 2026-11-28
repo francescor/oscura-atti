@@ -2,7 +2,15 @@
 
 **English** · [Italiano](README.it.md)
 
-**Local, rule-based redaction of personal data: no cloud, no machine learning required. Use it as an
+[![tests](https://github.com/francescor/oscura-atti/actions/workflows/tests.yml/badge.svg)](https://github.com/francescor/oscura-atti/actions/workflows/tests.yml)
+[![PyPI](https://img.shields.io/pypi/v/oscura-atti)](https://pypi.org/project/oscura-atti/)
+[![MCP Registry](https://img.shields.io/badge/MCP_Registry-io.github.francescor%2Foscura--atti-blue)](https://registry.modelcontextprotocol.io/v0.1/servers?search=io.github.francescor/oscura-atti)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/francescor/oscura-atti/badge)](https://scorecard.dev/viewer/?uri=github.com/francescor/oscura-atti)
+[![License: AGPL-3.0-or-later](https://img.shields.io/badge/license-AGPL--3.0--or--later-blue)](LICENSE)
+
+<!-- mcp-name: io.github.francescor/oscura-atti -->
+
+**Local, rule-based redaction of personal data (PII): no cloud, no machine learning required. Use it as an
 MCP server for Claude and other AI agents, from the command line, as a Python library or as a Docker image.**
 
 It redacts public-sector documents (PDF, digitally signed `.p7m`, Word/Excel/OpenDocument, images, text) so
@@ -82,7 +90,7 @@ Nothing is stored: the mapping between values and labels exists only during the 
 ## Install
 
 ```bash
-pip install "oscura-atti[mcp] @ git+https://github.com/francescor/oscura-atti"
+pip install oscura-atti          # or run it without installing: uvx oscura-atti --help
 # OCR for scanned pages:
 sudo apt install tesseract-ocr tesseract-ocr-ita   # or -eng, -spa, -fra, -deu
 ```
@@ -92,11 +100,24 @@ project is AGPL-3.0 too. Optional: LibreOffice (`soffice`) to convert office doc
 (`pip install "oscura-atti[ner]"`, ~2 GB with PyTorch) for a neural model that finds names with no
 contextual cue at all.
 
+MCP clients that read the [official MCP Registry](https://registry.modelcontextprotocol.io/v0.1/servers?search=io.github.francescor/oscura-atti) can install it from there:
+the entry `io.github.francescor/oscura-atti` starts it with `uvx oscura-atti mcp` or with the Docker image.
+
 ## Docker
 
 A ready image with OCR (Tesseract: Italian, English, Spanish, French, German) and LibreOffice is
-published at `ghcr.io/francescor/oscura-atti` by the "docker image" GitHub Action. The container
-runs as an unprivileged user; `/data` is the only folder the tools can read and write by path.
+published at `ghcr.io/francescor/oscura-atti` (linux/amd64 and linux/arm64) by the `publish` GitHub
+workflow. The container runs as an unprivileged user; `/data` is the only folder the tools can read and
+write by path.
+
+Release images are signed with [cosign](https://docs.sigstore.dev/) (keyless, by the GitHub workflow)
+and carry an SBOM and build provenance. To check that an image was built from this repository:
+
+```bash
+cosign verify ghcr.io/francescor/oscura-atti:0.1.1 \
+  --certificate-identity-regexp '^https://github.com/francescor/oscura-atti/\.github/workflows/publish\.yml@refs/tags/v' \
+  --certificate-oidc-issuer https://token.actions.githubusercontent.com
+```
 
 **One-off use (command line):**
 
@@ -152,7 +173,7 @@ oscura-atti mcp --http --port 8000   # Streamable HTTP at /mcp
 Claude Code, with file paths allowed inside the current folder:
 
 ```bash
-claude mcp add oscura-atti -e OSCURA_ATTI_DIR="$PWD" -- oscura-atti mcp
+claude mcp add oscura-atti -e OSCURA_ATTI_DIR="$PWD" -- uvx oscura-atti mcp
 ```
 
 Then ask, for example: *"Redact act.pdf with oscura-atti into act.redacted.pdf and tell me the outcome"*.
@@ -247,6 +268,12 @@ invented act (PDFs are refused there too).
 
 The README exists in English and Italian (`README.md`, `README.it.md`): a commit that changes one
 must change the other too (pre-commit hook and CI check, `tools/check_translations.py`).
+
+## Contributing and security
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) and the [changelog](CHANGELOG.md). A personal value still readable
+in a redacted copy is a **security issue**: report it privately as described in [SECURITY.md](SECURITY.md),
+never with the real document.
 
 ## Licence
 

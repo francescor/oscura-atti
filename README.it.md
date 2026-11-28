@@ -2,7 +2,15 @@
 
 [English](README.md) · **Italiano**
 
-**Oscuramento dei dati personali in locale, a regole: niente cloud, niente apprendimento automatico
+[![tests](https://github.com/francescor/oscura-atti/actions/workflows/tests.yml/badge.svg)](https://github.com/francescor/oscura-atti/actions/workflows/tests.yml)
+[![PyPI](https://img.shields.io/pypi/v/oscura-atti)](https://pypi.org/project/oscura-atti/)
+[![MCP Registry](https://img.shields.io/badge/MCP_Registry-io.github.francescor%2Foscura--atti-blue)](https://registry.modelcontextprotocol.io/v0.1/servers?search=io.github.francescor/oscura-atti)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/francescor/oscura-atti/badge)](https://scorecard.dev/viewer/?uri=github.com/francescor/oscura-atti)
+[![License: AGPL-3.0-or-later](https://img.shields.io/badge/license-AGPL--3.0--or--later-blue)](LICENSE)
+
+<!-- mcp-name: io.github.francescor/oscura-atti -->
+
+**Oscuramento dei dati personali (PII, *personally identifiable information*) in locale, a regole: niente cloud, niente apprendimento automatico
 obbligatorio. Si usa come server MCP per Claude e gli altri agenti di IA, da riga di comando, come
 libreria Python o come immagine Docker.**
 
@@ -87,7 +95,7 @@ Non si conserva nulla: la corrispondenza tra dati ed etichette esiste solo duran
 ## Installazione
 
 ```bash
-pip install "oscura-atti[mcp] @ git+https://github.com/francescor/oscura-atti"
+pip install oscura-atti          # oppure senza installarlo: uvx oscura-atti --help
 # OCR per le pagine scansionate:
 sudo apt install tesseract-ocr tesseract-ocr-ita   # oppure -eng, -spa, -fra, -deu
 ```
@@ -97,12 +105,25 @@ il progetto è AGPL-3.0. Facoltativi: LibreOffice (`soffice`) per convertire i d
 l'extra `ner` (`pip install "oscura-atti[ner]"`, ~2 GB con PyTorch) per un modello neurale che
 trova anche i nomi senza alcun indizio nel contesto.
 
+I client MCP che leggono il [registro ufficiale MCP](https://registry.modelcontextprotocol.io/v0.1/servers?search=io.github.francescor/oscura-atti) possono installarlo da lì: la voce
+`io.github.francescor/oscura-atti` lo avvia con `uvx oscura-atti mcp` o con l'immagine Docker.
+
 ## Docker
 
 Un'immagine pronta con OCR (Tesseract: italiano, inglese, spagnolo, francese, tedesco) e LibreOffice
-viene pubblicata in `ghcr.io/francescor/oscura-atti` dalla GitHub Action «docker image». Il
-container gira con un utente senza privilegi; `/data` è l'unica cartella che gli strumenti possono
-leggere e scrivere tramite percorso.
+viene pubblicata in `ghcr.io/francescor/oscura-atti` (linux/amd64 e linux/arm64) dal workflow GitHub
+`publish`. Il container gira con un utente senza privilegi; `/data` è l'unica cartella che gli
+strumenti possono leggere e scrivere tramite percorso.
+
+Le immagini delle release sono firmate con [cosign](https://docs.sigstore.dev/) (senza chiavi, dal
+workflow GitHub) e hanno SBOM e attestazione di provenienza. Per controllare che un'immagine sia stata
+costruita da questo repository:
+
+```bash
+cosign verify ghcr.io/francescor/oscura-atti:0.1.1 \
+  --certificate-identity-regexp '^https://github.com/francescor/oscura-atti/\.github/workflows/publish\.yml@refs/tags/v' \
+  --certificate-oidc-issuer https://token.actions.githubusercontent.com
+```
 
 **Uso singolo (riga di comando):**
 
@@ -160,7 +181,7 @@ oscura-atti mcp --http --port 8000   # Streamable HTTP su /mcp
 Claude Code, con i percorsi di file ammessi nella cartella corrente:
 
 ```bash
-claude mcp add oscura-atti -e OSCURA_ATTI_DIR="$PWD" -- oscura-atti mcp
+claude mcp add oscura-atti -e OSCURA_ATTI_DIR="$PWD" -- uvx oscura-atti mcp
 ```
 
 Poi basta chiedere, per esempio: *«Oscura atto.pdf con oscura-atti in atto.oscurato.pdf e dimmi
@@ -259,6 +280,12 @@ prodotti da `tools/make_media.py` a partire da un atto inventato (anche lì i PD
 Il README esiste in inglese e in italiano (`README.md`, `README.it.md`): un commit che modifica uno
 dei due deve modificare anche l'altro (hook prima del commit e controllo nella CI,
 `tools/check_translations.py`).
+
+## Contribuire e sicurezza
+
+Vedi [CONTRIBUTING.md](CONTRIBUTING.md) (in inglese, ma si può scrivere in italiano) e il
+[changelog](CHANGELOG.md). Un dato personale ancora leggibile in una copia oscurata è un **problema di
+sicurezza**: va segnalato in privato come spiegato in [SECURITY.md](SECURITY.md), mai con il documento vero.
 
 ## Licenza
 

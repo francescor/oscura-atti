@@ -1,0 +1,19 @@
+name: Feature request
+description: A new kind of value, language, document format or integration
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: You can write in English or Italian. Examples must be invented.
+  - type: textarea
+    id: need
+    attributes:
+      label: What you need and why
+      description: Who would use it, on which documents (described, not attached).
+    validations:
+      required: true
+  - type: textarea
+    id: example
+    attributes:
+      label: Invented example
+      render: text

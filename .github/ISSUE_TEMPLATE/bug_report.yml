@@ -1,0 +1,42 @@
+name: Bug report
+description: A crash, an error or wrong behaviour that is not about what gets redacted
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Never attach a real document or paste real personal data.** Reproduce with `oscura-atti sample`
+        or with an invented file. You can write in English or Italian.
+  - type: checkboxes
+    id: no-real-data
+    attributes:
+      label: Personal data
+      options:
+        - label: This issue contains no real document and no real personal data.
+          required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what you expected
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Commands, configuration (`--config` JSON), MCP client.
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Error output
+      render: text
+  - type: input
+    id: env
+    attributes:
+      label: Version and environment
+      placeholder: "oscura-atti 0.1.1, Python 3.12, Linux / macOS / Windows, Docker image tag"
+    validations:
+      required: true
