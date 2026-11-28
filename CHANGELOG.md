@@ -22,6 +22,11 @@ section of each version as the notes of its GitHub release.
 - Tests on Python 3.11, 3.12, 3.13 and 3.14; a CI check that the version is the same everywhere;
   OpenSSF Scorecard; Dependabot for Python, GitHub Actions and the Docker base image.
 
+### Fixed
+- Python 3.11: `oscura-atti sample` and the benchmark failed with a `SyntaxError`, because the
+  generator of invented documents used an f-string syntax that exists only from Python 3.12.
+  Redaction itself was not affected. Found by the new test matrix.
+
 ### Changed
 - The MCP SDK is now a core dependency, so `uvx oscura-atti mcp` works out of the box. The `mcp`
   extra is kept as an empty alias: `pip install "oscura-atti[mcp]"` still works.

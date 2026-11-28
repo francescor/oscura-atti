@@ -197,7 +197,7 @@ def _body(kind: str, rng: random.Random, people: list[Person], officials: list[P
                      f"euro {rng.randint(500, 5000)},00 da accreditare sul conto IBAN {iban_txt} intestato al "
                      f"beneficiario;")
         remember(a.full, iban_txt)
-        paras.append(f"2) di dare atto che la ditta Edilizia {rng.choice(["Fontanelle", "Belvedere", "Piave", "Sile", "Sile Basso"])} S.r.l., P.IVA {vat}, eseguirà i "
+        paras.append(f"2) di dare atto che la ditta Edilizia {rng.choice(['Fontanelle', 'Belvedere', 'Piave', 'Sile', 'Sile Basso'])} S.r.l., P.IVA {vat}, eseguirà i "
                      f"lavori di ripristino;")
         paras.append(f"3) di trasmettere il presente atto a {a.last.upper()} {a.first} e a {b.last}.")
         remember(f"{a.last.upper()} {a.first}", b.last)
